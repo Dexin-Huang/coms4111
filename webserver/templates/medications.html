@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Medication Catalog - Medical Records{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-prescription2"></i> Medication Catalog</h1>
+            <p class="text-muted">Browse and search available medications</p>
+        </div>
+    </div>
+
+    <!-- Search/Filter Form -->
+    <div class="search-form">
+        <h5 class="mb-3"><i class="bi bi-search"></i> Search Medications</h5>
+        <form method="GET" action="/medications">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="search" class="form-label">Medication Name</label>
+                    <input type="text" class="form-control" id="search" name="search"
+                           value="{{ search }}" placeholder="e.g., aspirin, insulin, amoxicillin">
+                </div>
+                <div class="col-md-4">
+                    <label for="form" class="form-label">Medication Form</label>
+                    <select class="form-select" id="form" name="form">
+                        <option value="">All Forms</option>
+                        {% for med_form in medication_forms %}
+                        <option value="{{ med_form }}" {% if request.args.get('form') == med_form %}selected{% endif %}>
+                            {{ med_form }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a href="/medications" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                    <span class="ms-3 text-muted">
+                        <i class="bi bi-info-circle"></i> Found {{ medications|length }} medication(s)
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Statistics Cards -->
+    {% if medications %}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-capsule text-primary" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ medications|length }}</h4>
+                    <p class="text-muted mb-0">Medications Listed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people text-success" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ medications|sum(attribute='patient_count') or 0 }}</h4>
+                    <p class="text-muted mb-0">Total Patient Uses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-prescription text-danger" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ medications|sum(attribute='prescription_count') or 0 }}</h4>
+                    <p class="text-muted mb-0">Total Prescriptions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medications Table -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table"></i> Medication List (Sorted by Usage)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">ID</th>
+                            <th width="35%">Medication Name</th>
+                            <th width="15%">Strength</th>
+                            <th width="15%">Form</th>
+                            <th width="12%" class="text-center">Patients</th>
+                            <th width="12%" class="text-center">Prescriptions</th>
+                            <th width="6%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for medication in medications %}
+                        <tr>
+                            <td><small>{{ medication.medication_id }}</small></td>
+                            <td>
+                                <strong>{{ medication.name[:50] }}</strong>
+                                {% if medication.name|length > 50 %}...{% endif %}
+                            </td>
+                            <td>
+                                {% if medication.strength %}
+                                    {{ medication.strength }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if medication.form %}
+                                    <span class="badge bg-info">{{ medication.form }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if medication.patient_count %}
+                                    <span class="badge bg-success fs-6">{{ medication.patient_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if medication.prescription_count %}
+                                    <span class="badge bg-primary fs-6">{{ medication.prescription_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if medication.prescription_count %}
+                                    <a href="/prescriptions?medication_name={{ medication.name }}"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="View prescriptions">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="bi bi-info-circle"></i>
+                Showing top 100 medications sorted by prescription count.
+                Click <i class="bi bi-eye"></i> to view prescriptions for each medication.
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        {% if search %}
+            No medications found matching "{{ search }}". Try a different search term.
+        {% else %}
+            No medications available in the database.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Info Card -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-info-circle"></i> About This Catalog
+        </div>
+        <div class="card-body">
+            <p>
+                This medication catalog shows all medications available in the database along with usage statistics.
+                Each medication includes its name, strength, form (tablet, injection, etc.), and prescription counts.
+            </p>
+            <p class="mb-0">
+                <strong>Features:</strong> Search by medication name, filter by form, view prescription history.
+                Click the view icon to see all prescriptions for a specific medication.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

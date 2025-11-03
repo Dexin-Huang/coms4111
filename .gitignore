@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+flask.log
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.bak
+
+# Test and development files
+test_*.py
+check_*.py
+get_table_*.py
+find_*.py
+*_test.py
+
+# Project downloads and HTML files
+*.html
+!webserver/templates/*.html
+*.zip
+*.tar
+*.tar.gz
+gcport_files/
+
+# Mac hidden files
+._*

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Patients - Medical Records System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-people"></i> Patient Directory</h1>
+            <p class="text-muted">Search and browse patient records</p>
+        </div>
+    </div>
+
+    <!-- Search/Filter Form -->
+    <div class="search-form">
+        <h5 class="mb-3"><i class="bi bi-funnel"></i> Filter Patients</h5>
+        <form method="GET" action="/patients">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="subject_id" class="form-label">Patient ID</label>
+                    <input type="number" class="form-control" id="subject_id" name="subject_id"
+                           value="{{ request.args.get('subject_id', '') }}" placeholder="e.g., 10020740">
+                </div>
+                <div class="col-md-2">
+                    <label for="sex" class="form-label">Sex</label>
+                    <select class="form-select" id="sex" name="sex">
+                        <option value="">All</option>
+                        <option value="m" {% if request.args.get('sex') == 'm' %}selected{% endif %}>Male</option>
+                        <option value="f" {% if request.args.get('sex') == 'f' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="race" class="form-label">Race</label>
+                    <select class="form-select" id="race" name="race">
+                        <option value="">All</option>
+                        <option value="WHITE" {% if request.args.get('race') == 'WHITE' %}selected{% endif %}>White</option>
+                        <option value="BLACK/AFRICAN AMERICAN" {% if request.args.get('race') == 'BLACK/AFRICAN AMERICAN' %}selected{% endif %}>Black/African American</option>
+                        <option value="HISPANIC/LATINO" {% if request.args.get('race') == 'HISPANIC/LATINO' %}selected{% endif %}>Hispanic/Latino</option>
+                        <option value="ASIAN" {% if request.args.get('race') == 'ASIAN' %}selected{% endif %}>Asian</option>
+                        <option value="OTHER" {% if request.args.get('race') == 'OTHER' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="min_age" class="form-label">Min Age</label>
+                    <input type="number" class="form-control" id="min_age" name="min_age"
+                           value="{{ request.args.get('min_age', '') }}" placeholder="0" min="0" max="120">
+                </div>
+                <div class="col-md-2">
+                    <label for="max_age" class="form-label">Max Age</label>
+                    <input type="number" class="form-control" id="max_age" name="max_age"
+                           value="{{ request.args.get('max_age', '') }}" placeholder="120" min="0" max="120">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a href="/patients" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <span class="ms-3 text-muted">
+                        <i class="bi bi-info-circle"></i> Found {{ patients|length }} patient(s)
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if patients %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-list-ul"></i> Patient List ({{ patients|length }} results)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Sex</th>
+                            <th>Date of Birth</th>
+                            <th>Age</th>
+                            <th>Race</th>
+                            <th>Admissions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td><strong>{{ patient.subject_id }}</strong></td>
+                            <td>
+                                {% if patient.sex == 'm' %}
+                                    <span class="badge bg-primary">Male</span>
+                                {% else %}
+                                    <span class="badge bg-info">Female</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ patient.date_of_birth }}</td>
+                            <td>{{ patient.age }} years</td>
+                            <td>{{ patient.race }}</td>
+                            <td>
+                                <span class="badge bg-success">{{ patient.admission_count }} admissions</span>
+                            </td>
+                            <td>
+                                <a href="/patient/{{ patient.subject_id }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No patients found matching your search criteria. Try adjusting the filters.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

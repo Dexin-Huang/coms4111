@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - Medical Records{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-graph-up"></i> Analytics Dashboard</h1>
+            <p class="text-muted">Comprehensive database statistics and trends</p>
+        </div>
+    </div>
+
+    <!-- Overall Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-people text-primary" style="font-size: 2.5rem;"></i>
+                    <h2 class="mt-2">{{ overall_stats.patient_count }}</h2>
+                    <p class="text-muted mb-0">Total Patients</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-clipboard-plus text-success" style="font-size: 2.5rem;"></i>
+                    <h2 class="mt-2">{{ overall_stats.admission_count }}</h2>
+                    <p class="text-muted mb-0">Hospital Admissions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-capsule text-danger" style="font-size: 2.5rem;"></i>
+                    <h2 class="mt-2">{{ overall_stats.prescription_count }}</h2>
+                    <p class="text-muted mb-0">Prescriptions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-image text-info" style="font-size: 2.5rem;"></i>
+                    <h2 class="mt-2">{{ overall_stats.image_count }}</h2>
+                    <p class="text-muted mb-0">Medical Images</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-file-medical text-warning" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2">{{ overall_stats.condition_count }}</h3>
+                    <p class="text-muted mb-0 small">Conditions Catalogued</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-prescription2 text-primary" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2">{{ overall_stats.medication_count }}</h3>
+                    <p class="text-muted mb-0 small">Medications Available</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-person-badge text-success" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2">{{ overall_stats.provider_count }}</h3>
+                    <p class="text-muted mb-0 small">Healthcare Providers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-scissors text-danger" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2">{{ overall_stats.procedure_count }}</h3>
+                    <p class="text-muted mb-0 small">Procedures Performed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Diagnoses and Medications Row -->
+    <div class="row g-3 mb-4">
+        <!-- Top 10 Most Common Diagnoses -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-medical"></i> Top 10 Most Common Diagnoses</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="55%">Condition</th>
+                                    <th width="20%" class="text-center">Patients</th>
+                                    <th width="20%" class="text-center">Total Dx</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for diagnosis in top_diagnoses %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <strong>{{ diagnosis.condition_name[:40] }}</strong>
+                                        {% if diagnosis.condition_name|length > 40 %}...{% endif %}
+                                        <br><small class="text-muted">{{ diagnosis.icd_code }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ diagnosis.patient_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ diagnosis.total_diagnoses }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Most Prescribed Medications -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-capsule"></i> Top 10 Most Prescribed Medications</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="65%">Medication</th>
+                                    <th width="30%" class="text-center">Total Prescriptions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in top_medications %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <strong>{{ med.medication_name[:35] }}</strong>
+                                        {% if med.medication_name|length > 35 %}...{% endif %}
+                                        {% if med.strength %}
+                                        <br><small class="text-muted">{{ med.strength }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success fs-6">{{ med.prescription_count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admission Statistics and Demographics Row -->
+    <div class="row g-3 mb-4">
+        <!-- Admission Type Statistics -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-pulse"></i> Admission Statistics by Type</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Admission Type</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-center">Patients</th>
+                                    <th class="text-center">Avg Days</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in admission_stats %}
+                                <tr>
+                                    <td><strong>{{ stat.admission_type }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ stat.admission_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ stat.unique_patients }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if stat.avg_length_days %}
+                                        <span class="badge bg-info">{{ "%.1f"|format(stat.avg_length_days) }}</span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Demographics -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Patient Demographics Breakdown</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sex</th>
+                                    <th>Race</th>
+                                    <th class="text-center">Patients</th>
+                                    <th class="text-center">Avg Age</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for demo in demographics %}
+                                <tr>
+                                    <td>
+                                        {% if demo.sex == 'm' %}
+                                        <span class="badge bg-primary">M</span>
+                                        {% else %}
+                                        <span class="badge bg-info">F</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small>{{ demo.race }}</small></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ demo.patient_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{ "%.0f"|format(demo.avg_age) }} yrs
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical Imaging and Provider Stats Row -->
+    <div class="row g-3 mb-4">
+        <!-- Medical Imaging Statistics -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-image"></i> Medical Imaging Statistics</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Viewpoint</th>
+                                    <th class="text-center">Image Count</th>
+                                    <th class="text-center">Patient Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for img in imaging_stats %}
+                                <tr>
+                                    <td><strong>{{ img.viewpoint }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ img.image_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ img.patient_count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Providers by Orders -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header" style="background-color: #6f42c1; color: white;">
+                    <h5 class="mb-0"><i class="bi bi-person-badge"></i> Top 10 Providers by Order Volume</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Provider ID</th>
+                                    <th class="text-center">Admissions</th>
+                                    <th class="text-center">Orders</th>
+                                    <th class="text-center">Order Types</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for provider in provider_stats %}
+                                <tr>
+                                    <td><code>{{ provider.provider_id }}</code></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ provider.admissions_served }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ provider.total_orders }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ provider.order_types }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Admission Trends -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #20c997; color: white;">
+                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Monthly Admission Trends (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-center">Admissions</th>
+                                    <th class="text-center">Unique Patients</th>
+                                    <th width="60%">Volume Indicator</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set max_admissions = monthly_trends|map(attribute='admission_count')|max %}
+                                {% for trend in monthly_trends %}
+                                <tr>
+                                    <td><strong>{{ trend.month }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary fs-6">{{ trend.admission_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success fs-6">{{ trend.unique_patients }}</span>
+                                    </td>
+                                    <td>
+                                        {% set bar_width = (trend.admission_count / max_admissions * 100)|int %}
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar"
+                                                 style="width: {{ bar_width }}%"
+                                                 aria-valuenow="{{ trend.admission_count }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="{{ max_admissions }}">
+                                                {{ trend.admission_count }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> About This Dashboard
+                </div>
+                <div class="card-body">
+                    <p>
+                        This comprehensive analytics dashboard demonstrates complex SQL aggregation queries across
+                        multiple tables using GROUP BY, COUNT, AVG, and JOIN operations. All statistics are calculated
+                        in real-time from the wl2822 database schema.
+                    </p>
+                    <p class="mb-0">
+                        <strong>Queries used:</strong> 8 complex aggregation queries with GROUP BY, COUNT DISTINCT,
+                        AVG calculations, and multi-table JOINs. Data refreshes on each page load.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

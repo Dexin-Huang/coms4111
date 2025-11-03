@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Prescriptions - Medical Records{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-capsule"></i> Prescription Records</h1>
+            <p class="text-muted">Browse and search patient prescriptions</p>
+        </div>
+    </div>
+
+    <!-- Search/Filter Form -->
+    <div class="search-form">
+        <h5 class="mb-3"><i class="bi bi-funnel"></i> Filter Prescriptions</h5>
+        <form method="GET" action="/prescriptions">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="subject_id" class="form-label">Patient ID</label>
+                    <input type="number" class="form-control" id="subject_id" name="subject_id"
+                           value="{{ request.args.get('subject_id', '') }}" placeholder="e.g., 10020740">
+                </div>
+                <div class="col-md-3">
+                    <label for="medication_name" class="form-label">Medication Name</label>
+                    <input type="text" class="form-control" id="medication_name" name="medication_name"
+                           value="{{ request.args.get('medication_name', '') }}" placeholder="e.g., aspirin">
+                </div>
+                <div class="col-md-3">
+                    <label for="route" class="form-label">Route</label>
+                    <select class="form-select" id="route" name="route">
+                        <option value="">All Routes</option>
+                        {% for rx_route in prescription_routes %}
+                        <option value="{{ rx_route }}" {% if request.args.get('route') == rx_route %}selected{% endif %}>
+                            {{ rx_route }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="from_date" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="from_date" name="from_date"
+                           value="{{ request.args.get('from_date', '') }}">
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label for="to_date" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="to_date" name="to_date"
+                           value="{{ request.args.get('to_date', '') }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a href="/prescriptions" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <span class="ms-3 text-muted">
+                        <i class="bi bi-info-circle"></i> Found {{ prescriptions|length }} prescription(s)
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if prescriptions %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-list-ul"></i> Prescription Records ({{ prescriptions|length }} results)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Rx ID</th>
+                            <th>Patient</th>
+                            <th>Age/Sex</th>
+                            <th>Medication</th>
+                            <th>Strength/Form</th>
+                            <th>Dose</th>
+                            <th>Route</th>
+                            <th>Frequency</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rx in prescriptions %}
+                        <tr>
+                            <td><small>{{ rx.prescription_id }}</small></td>
+                            <td>
+                                <a href="/patient/{{ rx.subject_id }}">
+                                    <strong>{{ rx.subject_id }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                {{ rx.patient_age }} yrs /
+                                {% if rx.sex == 'm' %}
+                                    <span class="badge bg-primary">M</span>
+                                {% else %}
+                                    <span class="badge bg-info">F</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ rx.medication_name[:30] }}</strong>
+                                {% if rx.medication_name|length > 30 %}...{% endif %}
+                            </td>
+                            <td>
+                                <small>
+                                    {% if rx.strength %}{{ rx.strength }}{% endif %}
+                                    {% if rx.form %}<br><span class="badge bg-secondary">{{ rx.form }}</span>{% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <small>
+                                    {% if rx.dose %}
+                                        {{ rx.dose }}
+                                        {% if rx.dose_unit %}{{ rx.dose_unit }}{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                {% if rx.route %}
+                                    <span class="badge bg-info">{{ rx.route }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>
+                                    {% if rx.frequency %}
+                                        {{ rx.frequency[:15] }}
+                                        {% if rx.frequency|length > 15 %}...{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td><small>{{ rx.start_time }}</small></td>
+                            <td>
+                                <small>
+                                    {% if rx.end_time %}
+                                        {{ rx.end_time }}
+                                    {% else %}
+                                        <span class="text-muted">Ongoing</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <a href="/patient/{{ rx.subject_id }}" class="btn btn-sm btn-outline-primary" title="View Patient">
+                                    <i class="bi bi-person"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="bi bi-info-circle"></i>
+                Showing up to 100 most recent prescriptions. Use filters to narrow results.
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No prescriptions found matching your search criteria. Try adjusting the filters.
+    </div>
+    {% endif %}
+
+    <!-- Statistics Card -->
+    {% if prescriptions %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-graph-up"></i> Quick Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="text-muted">Total Prescriptions</h6>
+                            <h3>{{ prescriptions|length }}</h3>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Unique Patients</h6>
+                            <h3>{{ prescriptions|map(attribute='subject_id')|unique|list|length }}</h3>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="text-muted">Unique Medications</h6>
+                            <h4 class="text-primary">{{ prescriptions|map(attribute='medication_name')|unique|list|length }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Active Prescriptions</h6>
+                            <h4 class="text-success">{{ prescriptions|rejectattr('end_time')|list|length }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-pie-chart"></i> Route Distribution
+                </div>
+                <div class="card-body">
+                    {% set route_counts = {} %}
+                    {% for rx in prescriptions %}
+                        {% if rx.route %}
+                            {% set _ = route_counts.update({rx.route: route_counts.get(rx.route, 0) + 1}) %}
+                        {% endif %}
+                    {% endfor %}
+                    <ul class="list-group list-group-flush">
+                        {% for route, count in route_counts.items()|sort(attribute='1', reverse=true) %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            {{ route }}
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Info Card -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-info-circle"></i> About Prescriptions
+        </div>
+        <div class="card-body">
+            <p>
+                This prescription browser shows all medication prescriptions in the database with detailed information
+                about dosage, route of administration, frequency, and duration.
+            </p>
+            <p class="mb-0">
+                <strong>Features:</strong> Filter by patient, medication name, route, or date range.
+                View patient details by clicking the patient ID or person icon.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

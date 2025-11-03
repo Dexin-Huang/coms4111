@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Condition Analytics - Medical Records{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-file-medical"></i> Condition Analytics</h1>
+            <p class="text-muted">Browse medical conditions with patient statistics and diagnosis trends</p>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-form">
+        <h5 class="mb-3"><i class="bi bi-search"></i> Search Conditions</h5>
+        <form method="GET" action="/conditions">
+            <div class="row g-3">
+                <div class="col-md-10">
+                    <label for="search" class="form-label">Condition Name or ICD Code</label>
+                    <input type="text" class="form-control" id="search" name="search"
+                           value="{{ search }}" placeholder="e.g., diabetes, hypertension, J44.0">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <a href="/conditions" class="btn btn-sm btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                    <span class="ms-3 text-muted">
+                        <i class="bi bi-info-circle"></i> Found {{ conditions|length }} condition(s)
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Analytics Summary Cards -->
+    {% if conditions %}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-list-check text-primary" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ conditions|length }}</h4>
+                    <p class="text-muted mb-0">Conditions Listed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people text-success" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ conditions|sum(attribute='patient_count') or 0 }}</h4>
+                    <p class="text-muted mb-0">Total Patient Instances</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-clipboard-pulse text-danger" style="font-size: 2rem;"></i>
+                    <h4 class="mt-2">{{ conditions|sum(attribute='diagnosis_count') or 0 }}</h4>
+                    <p class="text-muted mb-0">Total Diagnoses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conditions Table -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table"></i> Condition Analytics (Sorted by Patient Count)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="10%">ICD Code</th>
+                            <th width="5%">Ver</th>
+                            <th width="35%">Condition Name</th>
+                            <th width="10%" class="text-center">Patients</th>
+                            <th width="10%" class="text-center">Diagnoses</th>
+                            <th width="12%">First Seen</th>
+                            <th width="12%">Latest Seen</th>
+                            <th width="6%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for condition in conditions %}
+                        <tr>
+                            <td><code>{{ condition.icd_code }}</code></td>
+                            <td><span class="badge bg-secondary">{{ condition.icd_version }}</span></td>
+                            <td>
+                                <strong>{{ condition.condition_name[:60] }}</strong>
+                                {% if condition.condition_name|length > 60 %}...{% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if condition.patient_count %}
+                                    <span class="badge bg-primary fs-6">{{ condition.patient_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if condition.diagnosis_count %}
+                                    <span class="badge bg-success fs-6">{{ condition.diagnosis_count }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if condition.first_diagnosis %}
+                                    <small>{{ condition.first_diagnosis }}</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if condition.latest_diagnosis %}
+                                    <small>{{ condition.latest_diagnosis }}</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if condition.patient_count %}
+                                    <a href="/condition/{{ condition.icd_code }}/{{ condition.icd_version }}"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="View details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="bi bi-info-circle"></i>
+                Showing top 100 results. Use search to find specific conditions.
+                Data aggregated from admission diagnoses with patient and diagnosis counts.
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        {% if search %}
+            No conditions found matching "{{ search }}". Try a different search term.
+        {% else %}
+            No conditions available in the database.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Explanation Card -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-lightbulb"></i> About This Analytics View
+        </div>
+        <div class="card-body">
+            <h6>What you're seeing:</h6>
+            <ul class="mb-2">
+                <li><strong>Patients:</strong> Number of unique patients diagnosed with this condition</li>
+                <li><strong>Diagnoses:</strong> Total number of times this condition was diagnosed (across all admissions)</li>
+                <li><strong>First/Latest Seen:</strong> Date range showing when this condition was first and most recently diagnosed</li>
+            </ul>
+            <h6>Technical Details:</h6>
+            <p class="mb-0">
+                <small class="text-muted">
+                    This page uses complex SQL aggregation with GROUP BY, COUNT DISTINCT, and LEFT JOINs
+                    to analyze diagnosis patterns across the admission_diagnosis and condition tables.
+                    Results are ordered by patient count to show the most common conditions first.
+                </small>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

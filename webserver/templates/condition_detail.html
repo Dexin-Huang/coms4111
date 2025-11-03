@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}{{ condition.condition_name }} - Condition Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/conditions">Conditions</a></li>
+                    <li class="breadcrumb-item active">{{ condition.icd_code }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Condition Header Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-file-medical-fill"></i> Condition Details
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>{{ condition.condition_name }}</h4>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="25%">ICD Code:</th>
+                            <td><code class="fs-5">{{ condition.icd_code }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>ICD Version:</th>
+                            <td><span class="badge bg-secondary fs-6">ICD-{{ condition.icd_version }}</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-4">
+                    <!-- Statistics Summary -->
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted">Statistics</h6>
+                            <div class="mb-2">
+                                <i class="bi bi-people text-primary" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0">{{ stats.total_patients }}</h3>
+                                <small class="text-muted">Patients</small>
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-clipboard-pulse text-success" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0">{{ stats.total_diagnoses }}</h3>
+                                <small class="text-muted">Total Diagnoses</small>
+                            </div>
+                            {% if stats.avg_rank %}
+                            <div>
+                                <strong>Avg Diagnosis Rank:</strong>
+                                <span class="badge bg-info">{{ "%.1f"|format(stats.avg_rank) }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    {% if stats.first_diagnosis or stats.latest_diagnosis %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6><i class="bi bi-clock-history"></i> Diagnosis Timeline</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>First Diagnosed:</strong> {{ stats.first_diagnosis }}
+                </div>
+                <div class="col-md-6">
+                    <strong>Most Recent:</strong> {{ stats.latest_diagnosis }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Diagnosed Patients -->
+    <h2 class="mb-3">
+        <i class="bi bi-people"></i> Patients Diagnosed with This Condition
+        <small class="text-muted">({{ patients|length }} diagnoses shown)</small>
+    </h2>
+
+    {% if patients %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table"></i> Diagnosis History
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Sex</th>
+                            <th>Age</th>
+                            <th>Race</th>
+                            <th>Admission ID</th>
+                            <th>Diagnosis Date</th>
+                            <th>Rank</th>
+                            <th>Admission Type</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td><strong>{{ patient.subject_id }}</strong></td>
+                            <td>
+                                {% if patient.sex == 'm' %}
+                                    <span class="badge bg-primary">Male</span>
+                                {% else %}
+                                    <span class="badge bg-info">Female</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ patient.age }} yrs</td>
+                            <td><small>{{ patient.race }}</small></td>
+                            <td><code>{{ patient.hadm_id }}</code></td>
+                            <td>{{ patient.diagnosed_on }}</td>
+                            <td>
+                                <span class="badge bg-warning text-dark">Rank {{ patient.rank }}</span>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ patient.admission_type }}</span></td>
+                            <td>
+                                <a href="/patient/{{ patient.subject_id }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="bi bi-info-circle"></i>
+                Showing up to 200 diagnoses. "Rank" indicates the priority/severity of this diagnosis during the admission (lower = more important).
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No patients have been diagnosed with this condition yet.
+    </div>
+    {% endif %}
+
+    <!-- Distribution Analysis -->
+    {% if patients %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-graph-up"></i> Quick Analysis
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Demographics Breakdown:</h6>
+                    <ul>
+                        <li><strong>Male patients:</strong> {{ patients|selectattr('sex', 'equalto', 'm')|list|length }}</li>
+                        <li><strong>Female patients:</strong> {{ patients|selectattr('sex', 'equalto', 'f')|list|length }}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Diagnosis Priority:</h6>
+                    <ul>
+                        <li><strong>Primary diagnosis (Rank 1):</strong> {{ patients|selectattr('rank', 'equalto', 1)|list|length }}</li>
+                        <li><strong>Secondary diagnoses:</strong> {{ patients|rejectattr('rank', 'equalto', 1)|list|length }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="/conditions" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Condition Browser
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

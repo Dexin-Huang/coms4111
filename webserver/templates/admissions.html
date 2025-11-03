@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Admissions - Medical Records{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-clipboard-plus"></i> Hospital Admissions</h1>
+            <p class="text-muted">Search and browse patient admission records</p>
+        </div>
+    </div>
+
+    <!-- Search/Filter Form -->
+    <div class="search-form">
+        <h5 class="mb-3"><i class="bi bi-funnel"></i> Filter Admissions</h5>
+        <form method="GET" action="/admissions">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="hadm_id" class="form-label">Admission ID</label>
+                    <input type="number" class="form-control" id="hadm_id" name="hadm_id"
+                           value="{{ request.args.get('hadm_id', '') }}" placeholder="e.g., 29079034">
+                </div>
+                <div class="col-md-3">
+                    <label for="subject_id" class="form-label">Patient ID</label>
+                    <input type="number" class="form-control" id="subject_id" name="subject_id"
+                           value="{{ request.args.get('subject_id', '') }}" placeholder="e.g., 10020740">
+                </div>
+                <div class="col-md-3">
+                    <label for="admission_type" class="form-label">Admission Type</label>
+                    <select class="form-select" id="admission_type" name="admission_type">
+                        <option value="">All Types</option>
+                        {% for type in admission_types %}
+                        <option value="{{ type }}" {% if request.args.get('admission_type') == type %}selected{% endif %}>
+                            {{ type }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="admission_location" class="form-label">Admission Location</label>
+                    <select class="form-select" id="admission_location" name="admission_location">
+                        <option value="">All Locations</option>
+                        {% for location in admission_locations %}
+                        <option value="{{ location }}" {% if request.args.get('admission_location') == location %}selected{% endif %}>
+                            {{ location }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label for="from_date" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="from_date" name="from_date"
+                           value="{{ request.args.get('from_date', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="to_date" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="to_date" name="to_date"
+                           value="{{ request.args.get('to_date', '') }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a href="/admissions" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                    <span class="ms-3 text-muted">
+                        <i class="bi bi-info-circle"></i> Found {{ admissions|length }} admission(s)
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if admissions %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-list-ul"></i> Admission Records ({{ admissions|length }} results)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Admission ID</th>
+                            <th>Patient</th>
+                            <th>Age/Sex</th>
+                            <th>Admission Time</th>
+                            <th>Discharge Time</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Diagnoses</th>
+                            <th>Rx</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admission in admissions %}
+                        <tr>
+                            <td><code>{{ admission.hadm_id }}</code></td>
+                            <td>
+                                <a href="/patient/{{ admission.subject_id }}">
+                                    <strong>{{ admission.subject_id }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                {{ admission.patient_age }} yrs /
+                                {% if admission.sex == 'm' %}
+                                    <span class="badge bg-primary">M</span>
+                                {% else %}
+                                    <span class="badge bg-info">F</span>
+                                {% endif %}
+                            </td>
+                            <td><small>{{ admission.admission_intime }}</small></td>
+                            <td><small>{{ admission.admission_outtime }}</small></td>
+                            <td>
+                                <span class="badge bg-primary">{{ admission.admission_type }}</span>
+                            </td>
+                            <td><small>{{ admission.admission_location }}</small></td>
+                            <td class="text-center">
+                                <span class="badge bg-danger">{{ admission.diagnosis_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success">{{ admission.prescription_count }}</span>
+                            </td>
+                            <td>
+                                <a href="/patient/{{ admission.subject_id }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View Patient
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="bi bi-info-circle"></i>
+                Showing up to 100 most recent admissions. Use filters to narrow results.
+                Diagnosis and prescription counts shown for each admission.
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No admissions found matching your search criteria. Try adjusting the filters.
+    </div>
+    {% endif %}
+
+    <!-- Statistics Card -->
+    {% if admissions %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-graph-up"></i> Quick Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="text-muted">Total Admissions</h6>
+                            <h3>{{ admissions|length }}</h3>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Unique Patients</h6>
+                            <h3>{{ admissions|map(attribute='subject_id')|unique|list|length }}</h3>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="text-muted">Total Diagnoses</h6>
+                            <h4 class="text-danger">{{ admissions|sum(attribute='diagnosis_count') }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Total Prescriptions</h6>
+                            <h4 class="text-success">{{ admissions|sum(attribute='prescription_count') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-pie-chart"></i> Admission Types Breakdown
+                </div>
+                <div class="card-body">
+                    {% set admission_type_counts = {} %}
+                    {% for admission in admissions %}
+                        {% set _ = admission_type_counts.update({admission.admission_type: admission_type_counts.get(admission.admission_type, 0) + 1}) %}
+                    {% endfor %}
+                    <ul class="list-group list-group-flush">
+                        {% for type, count in admission_type_counts.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            {{ type }}
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
