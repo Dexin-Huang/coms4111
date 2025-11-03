@@ -69,54 +69,35 @@
         </div>
     </div>
 
-    <!-- Quick Access -->
+    <!-- Quick Search -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <i class="bi bi-search"></i> Quick Search
                 </div>
                 <div class="card-body">
-                    <form action="/patients" method="GET" class="mb-3">
-                        <div class="input-group">
-                            <input type="number" name="subject_id" class="form-control" placeholder="Enter Patient ID" required>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search"></i> Search Patient
-                            </button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <form action="/patients" method="GET">
+                                <div class="input-group">
+                                    <input type="number" name="subject_id" class="form-control" placeholder="Enter Patient ID" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Search Patient
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-
-                    <form action="/conditions" method="GET">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control" placeholder="Search conditions by name or ICD code">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search"></i> Search Conditions
-                            </button>
+                        <div class="col-md-6">
+                            <form action="/conditions" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Search conditions by name or ICD code">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Search Conditions
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-graph-up"></i> Quick Links
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="/analytics" class="btn btn-outline-primary">
-                            <i class="bi bi-graph-up"></i> View Analytics Dashboard
-                        </a>
-                        <a href="/conditions" class="btn btn-outline-success">
-                            <i class="bi bi-file-medical"></i> Browse Conditions
-                        </a>
-                        <a href="/medications" class="btn btn-outline-info">
-                            <i class="bi bi-prescription2"></i> Browse Medications
-                        </a>
-                        <a href="/providers" class="btn btn-outline-warning">
-                            <i class="bi bi-person-badge"></i> Find Provider
-                        </a>
                     </div>
                 </div>
             </div>
