@@ -691,12 +691,9 @@ All data is from the MIMIC-IV medical dataset (anonymized, real patient data).
 
 ---
 
-## Acknowledgments
+## Dataset
 
-- **MIMIC-IV Dataset:** Johnson, A., Bulgarelli, L., Pollard, T., Horng, S., Celi, L. A., & Mark, R. (2023). MIMIC-IV (version 2.2). PhysioNet. https://doi.org/10.13026/6mm1-ek67
-- **Columbia University:** COMS W4111 Course Staff
-- **Flask Framework:** Pallets Projects
-- **Bootstrap:** Twitter Bootstrap team
+Johnson, A., Bulgarelli, L., Pollard, T., Horng, S., Celi, L. A., & Mark, R. (2023). MIMIC-IV (version 2.2). PhysioNet. https://doi.org/10.13026/6mm1-ek67
 
 ---
 
