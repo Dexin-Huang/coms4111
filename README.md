@@ -14,14 +14,13 @@
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Important: Changes from Original Proposal](#important-changes-from-original-proposal)
-3. [Database Schema](#database-schema)
-4. [Application Features](#application-features)
-5. [Showcase Pages](#showcase-pages)
-6. [Running the Application Locally](#running-the-application-locally)
-7. [Deployment to Google Cloud](#deployment-to-google-cloud)
-8. [Technical Highlights](#technical-highlights)
-9. [Team Contributions](#team-contributions)
+2. [Database Schema](#database-schema)
+3. [Application Features](#application-features)
+4. [Showcase Pages](#showcase-pages)
+5. [Running the Application Locally](#running-the-application-locally)
+6. [Deployment to Google Cloud](#deployment-to-google-cloud)
+7. [Technical Highlights](#technical-highlights)
+8. [To Do](#to-do)
 
 ---
 
@@ -36,77 +35,6 @@ This web application provides a comprehensive interface for browsing and analyzi
 - **12,910 medical conditions** catalogued with ICD codes
 - **6,413 medical images** with metadata
 - **4,982 healthcare providers** tracked
-
----
-
-## Important: Changes from Original Proposal
-
-### Original Proposal (Part 1)
-Our initial proposal in Part 1 was for an **Ophthalmology Patient Management System** focused specifically on eye care, including:
-- Ophthalmology-specific patient records
-- Vision test results and measurements
-- Eye disease diagnoses
-- Specialized optical prescriptions
-- Ophthalmic procedures
-
-**Proposed Schema:** Custom-designed ophthalmology tables with fields like visual acuity, intraocular pressure, and retinal examination results.
-
-### Actual Implementation (Parts 2 & 3)
-**What We Built:** A comprehensive **General Medical Records System** using the MIMIC-IV dataset
-
-### Why Did We Change?
-
-**Reason 1: Data Availability and Quality**
-- **MIMIC-IV** is a real, de-identified medical database from Beth Israel Deaconess Medical Center
-- Contains actual patient data (anonymized) rather than synthetic/fabricated data
-- Provides rich, complex relationships that better demonstrate database concepts
-- Already well-structured and validated by medical informatics researchers
-
-**Reason 2: Academic Value**
-- Working with real-world medical data provides more authentic learning experience
-- MIMIC-IV is widely used in academic research, making it more relevant
-- Demonstrates ability to work with production-quality database schemas
-- Better showcases complex SQL queries on meaningful, realistic data
-
-**Reason 3: Scope and Complexity**
-- MIMIC-IV's complexity (12 tables with intricate relationships) better demonstrates our database skills
-- Ophthalmology-specific data would have been narrower in scope
-- General medical records allow us to showcase more diverse query types
-- Better alignment with the course's emphasis on complex JOINs and aggregations
-
-**Reason 4: Team Decision**
-- After completing Part 2 (database implementation), we realized the MIMIC-IV dataset offered:
-  - More interesting analytics opportunities
-  - Richer multi-table relationships to showcase
-  - Better demonstration of SQL complexity
-  - More practical real-world relevance
-
-### What Stayed the Same
-
-Despite the change in domain, we maintained the core project requirements:
-- **Complex multi-table database schema** (12 tables, even more than originally proposed)
-- **Multiple relationships** (one-to-many, many-to-many)
-- **Comprehensive web interface** for data exploration
-- **Advanced SQL queries** with JOINs, aggregations, and filtering
-- **Two showcase pages** demonstrating query complexity (as required)
-
-### Schema Comparison
-
-**Original (Proposed):**
-- 8 tables focused on ophthalmology
-- Patient → Appointment → Exam → Prescription flow
-- Specialized fields for eye care
-
-**Actual (Implemented):**
-- 12 tables covering general medical care
-- Patient → Admission → Diagnoses/Prescriptions/Procedures/Images flow
-- Comprehensive medical record structure
-
-Both schemas demonstrate:
-- Proper normalization
-- Foreign key relationships
-- One-to-many and many-to-many relationships
-- Real-world data modeling
 
 ---
 
