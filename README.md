@@ -222,7 +222,7 @@ Our web application provides **10 comprehensive pages** for exploring medical da
 - Display all patients with admission counts
 - Age calculation from date of birth
 
-### 3. Patient Timeline ⭐ **SHOWCASE PAGE #1**
+### 3. Patient Timeline **SHOWCASE PAGE #1**
 **Route:** `/patient/<subject_id>`
 - **Complete medical history for individual patients**
 - **7 complex SQL queries** with multi-table JOINs
@@ -236,7 +236,7 @@ Our web application provides **10 comprehensive pages** for exploring medical da
   - Provider orders
 - **Technical Complexity:** 6+ table JOINs in a single page load
 
-### 4. Condition Analytics ⭐ **SHOWCASE PAGE #2**
+### 4. Condition Analytics **SHOWCASE PAGE #2**
 **Route:** `/conditions`
 - **Medical condition analytics with aggregated statistics**
 - **Complex GROUP BY query** with COUNT DISTINCT
@@ -691,88 +691,32 @@ Our application demonstrates:
 
 ---
 
-## Team Contributions
+## To Do
 
-### Dexin Huang (dh3172)
-
-**Completed - 10 Pages:**
-1. ✅ Base template with Columbia branding and navigation
-2. ✅ Homepage dashboard
-3. ✅ Patient directory with search and filtering
-4. ✅ **Patient Timeline (SHOWCASE #1)** - 7 queries, complex JOINs
-5. ✅ **Condition Analytics (SHOWCASE #2)** - GROUP BY aggregation
-6. ✅ Condition detail page with patient breakdown
-7. ✅ Admission search with filters
-8. ✅ Analytics dashboard - 8 aggregation queries
-9. ✅ Medications catalog with usage statistics
-10. ✅ Prescriptions browser with multi-table search
-11. ✅ Procedures catalog with statistics
-
-**Technical Contributions:**
-- Database schema implementation (Part 2)
-- Complex SQL query design (multi-table JOINs, aggregations)
-- Both showcase pages meeting complexity requirements
-- Flask application architecture and routing
-- Bootstrap 5 UI with Columbia University branding
-- Age normalization for anonymized dataset (2110 reference year)
-- Query optimization and schema validation
-- Documentation (README, code comments)
-
-**Lines of Code:** ~900+ lines in server.py, 11 HTML templates
-
----
-
-### Michael Lau (wl2822)
-
-**Remaining Work (3 Pages):**
+**Remaining Pages:**
 
 1. **Provider Lookup Page** (`/providers`)
    - [ ] List all providers with basic information
    - [ ] Search/filter by provider ID
    - [ ] Display order counts per provider
    - [ ] Link to orders placed by each provider
-   - **Estimated complexity:** Simple query, ~50 lines
 
 2. **Orders Browser Page** (`/orders`)
    - [ ] Browse all medical orders
    - [ ] Filter by: patient ID, admission ID, order type, date range
    - [ ] Display provider information (JOIN provider table)
    - [ ] Show order details and timestamps
-   - **Estimated complexity:** Moderate, ~80-100 lines
 
 3. **Medical Images Browser Page** (`/images`)
    - [ ] Display all medical imaging records
    - [ ] Filter by: patient ID, admission ID, study type
    - [ ] Show acquisition dates and viewpoint information
    - [ ] Link to patient records
-   - **Estimated complexity:** Simple query, ~60 lines
 
-**Additional Remaining Tasks:**
+**Additional Tasks:**
 - [ ] **Deployment to Google Cloud** - Deploy application to VM, configure firewall
-- [ ] **Final testing** - Test all 13 pages end-to-end
+- [ ] **Final testing** - Test all pages end-to-end
 - [ ] **Quality assurance** - Verify all queries return correct results
-- [ ] **Performance testing** - Check page load times
-
-**Other Responsibilities:**
-- Part 2 database population (completed)
-- Schema verification and validation
-- Coordinate with teammate on integration
-- Final project submission
-
----
-
-### Current Status
-
-**Completed:** 10/13 pages (77%)
-**Remaining:** 3/13 pages (23%)
-**Showcase Pages:** 2/2 completed ✅
-**Deployment:** Not yet started
-
-**Timeline:**
-- Pages 1-11: Completed (Dexin)
-- Pages 12-14: In progress (Michael)
-- Deployment: Planned
-- Final submission: Pending completion of above
 
 ---
 
@@ -816,67 +760,6 @@ Current database contains:
 - **Thousands** of procedures performed
 
 All data is from the MIMIC-IV medical dataset (anonymized, real patient data).
-
----
-
-## Interesting Queries to Try
-
-Once the application is running, try these:
-
-1. **Patient Timeline:**
-   - Visit `/patient/10020740` - See a complete medical history
-   - Explore diagnoses, prescriptions, and procedures over time
-
-2. **Condition Analytics:**
-   - Visit `/conditions` - See most common conditions
-   - Search "hypertension" - Find all related diagnoses
-   - Search "diabetes" - Compare prevalence
-
-3. **Medications:**
-   - Visit `/medications` - Browse medication catalog
-   - Search "insulin" - See usage statistics
-   - Click view icon to see all prescriptions
-
-4. **Analytics Dashboard:**
-   - Visit `/analytics` - See comprehensive statistics
-   - Review top 10 diagnoses and medications
-   - Examine monthly admission trends
-
-5. **Admissions:**
-   - Visit `/admissions` - Search hospital admissions
-   - Filter by date range or admission type
-   - See aggregated diagnosis/prescription counts
-
----
-
-## Future Enhancements
-
-Potential improvements for future development:
-
-1. **User Authentication:**
-   - Role-based access (doctor, nurse, admin)
-   - Secure login system
-   - Audit logging
-
-2. **Advanced Analytics:**
-   - Interactive charts (Chart.js, D3.js)
-   - Predictive modeling integration
-   - Custom report generation
-
-3. **Export Functionality:**
-   - PDF report generation
-   - CSV data export
-   - Print-friendly views
-
-4. **Search Enhancement:**
-   - Full-text search
-   - Advanced filtering options
-   - Saved searches
-
-5. **Performance Optimization:**
-   - Query result caching
-   - Pagination for large result sets
-   - Database query optimization
 
 ---
 
